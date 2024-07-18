@@ -4,6 +4,7 @@ from typing import Callable, List, Tuple
 import numpy as np
 
 from NeuralNetworks.activations import initialize_activation
+from NeuralNetworks.weights import initialize_weights
 
 
 class Layer(ABC):
@@ -32,3 +33,10 @@ class FullyConnected(Layer):
         self.n_in = None
         self.n_out = n_out
         self.activation = initialize_activation(activation)
+        
+        # initiate the weights
+        self.init_weights = initialize_weights(weight_init, activation=activation)
+        
+    def _init_parameters(self, X_shape: Tuple[int, int]) -> None:
+        self.n_in = X_shape[1]
+        # TODO 
