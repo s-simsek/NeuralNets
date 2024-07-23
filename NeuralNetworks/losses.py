@@ -1,7 +1,24 @@
+from abc import ABC, abstractmethod
+
 import numpy as np
 
 
-class CrossEntropy:
+class Loss(ABC):
+    @abstractmethod
+    def forward(self):
+        pass
+    
+    @abstractmethod
+    def backward(self):
+        pass
+    
+def initialize_loss(name: str) -> Loss:
+    if name == "cross_entropy":
+        return CrossEntropy(name)
+    else:
+        raise NotImplementedError("{} loss is not implemented".format(name))
+    
+class CrossEntropy(Loss):
     """Cross entropy loss function."""
 
     def __init__(self, name: str) -> None:

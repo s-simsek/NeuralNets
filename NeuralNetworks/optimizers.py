@@ -5,44 +5,37 @@ import numpy as np
 from NeuralNetworks.schedulers import initialize_scheduler
 
 
-def initialize_optimizer(
-    name,
-    lr,
-    lr_scheduler=None,
-    momentum=None,
-    clip_norm=None,
-    lr_decay=None,
-    staircase=None,
-    stage_length=None,
-):
+def initialize_optimizer(name,
+                         lr,
+                         lr_scheduler=None,
+                         momentum=None,
+                         clip_norm=None,
+                         lr_decay=None,
+                         staircase=None,
+                         stage_length=None):
+    
     if name == "SGD":
-        return SGD(
-            lr=lr,
-            lr_scheduler=lr_scheduler,
-            momentum=momentum,
-            clip_norm=clip_norm,
-            lr_decay=lr_decay,
-            staircase=staircase,
-            stage_length=stage_length,
-        )
+        return SGD(lr=lr,
+                   lr_scheduler=lr_scheduler,
+                   momentum=momentum,
+                   clip_norm=clip_norm,
+                   lr_decay=lr_decay,
+                   staircase=staircase,
+                   stage_length=stage_length)
     elif name == "Adam":
-        return Adam(
-            lr=lr,
-            lr_scheduler=lr_scheduler,
-            clip_norm=clip_norm,
-            lr_decay=lr_decay,
-            stage_length=stage_length,
-            staircase=staircase,
-        )
+        return Adam(lr=lr,
+                    lr_scheduler=lr_scheduler,
+                    clip_norm=clip_norm,
+                    lr_decay=lr_decay,
+                    stage_length=stage_length,
+                    staircase=staircase)
     elif name == "RMSprop":
-        return RMSprop(
-            lr=lr,
-            lr_scheduler=lr_scheduler,
-            clip_norm=clip_norm,
-            lr_decay=lr_decay,
-            stage_length=stage_length,
-            staircase=staircase,
-        )
+        return RMSprop(lr=lr,
+                       lr_scheduler=lr_scheduler,
+                       clip_norm=clip_norm,
+                       lr_decay=lr_decay,
+                       stage_length=stage_length,
+                       staircase=staircase)
     else:
         raise NotImplementedError
 
