@@ -11,10 +11,32 @@ class Activation(ABC):
 
     @abstractmethod
     def forward(self, Z):
+        """Forward pass for f(z) = z.
+
+        Parameters
+        ----------
+        Z  input pre-activations (any shape)
+
+        Returns
+        -------
+        f(z) as described above applied elementwise to `Z`
+        """
         pass
     
     @abstractmethod
     def backward(self, Z, dY):
+        """Backward pass for f(z) = z.
+
+        Parameters
+        ----------
+        Z   input to `forward` method
+        dY  derivative of loss w.r.t. the output of this layer
+            same shape as `Z`
+
+        Returns
+        -------
+        derivative of loss w.r.t. input of this layer
+        """
         pass
 
 def initialize_activation(name: str) -> Activation:
@@ -38,31 +60,9 @@ class Linear(Activation):
         super().__init__()
 
     def forward(self, Z: np.ndarray) -> np.ndarray:
-        """Forward pass for f(z) = z.
-
-        Parameters
-        ----------
-        Z  input pre-activations (any shape)
-
-        Returns
-        -------
-        f(z) as described above applied elementwise to `Z`
-        """
         return Z
 
     def backward(self, Z: np.ndarray, dY: np.ndarray) -> np.ndarray:
-        """Backward pass for f(z) = z.
-
-        Parameters
-        ----------
-        Z   input to `forward` method
-        dY  derivative of loss w.r.t. the output of this layer
-            same shape as `Z`
-
-        Returns
-        -------
-        derivative of loss w.r.t. input of this layer
-        """
         return dY
 
 
@@ -71,33 +71,9 @@ class ReLU(Activation):
         super().__init__()
 
     def forward(self, Z: np.ndarray) -> np.ndarray:
-        """Forward pass for relu activation:
-        f(z) = z if z >= 0
-               0 otherwise
-
-        Parameters
-        ----------
-        Z  input pre-activations (any shape)
-
-        Returns
-        -------
-        f(z) as described above applied elementwise to `Z`
-        """
         return np.maximum(0, Z)
 
     def backward(self, Z: np.ndarray, dY: np.ndarray) -> np.ndarray:
-        """Backward pass for relu activation.
-
-        Parameters
-        ----------
-        Z   input to `forward` method
-        dY  derivative of loss w.r.t. the output of this layer
-            same shape as `Z`
-
-        Returns
-        -------
-        derivative of loss w.r.t. input of this layer
-        """
         # Initialize gradient dZ
         dZ = np.array(dY, copy=True)
         
@@ -111,17 +87,6 @@ class SoftMax(Activation):
         super().__init__()
 
     def forward(self, Z: np.ndarray) -> np.ndarray:
-        """Forward pass for softmax activation.
-        Hint: The naive implementation might not be numerically stable.
-
-        Parameters
-        ----------
-        Z  input pre-activations (any shape)
-
-        Returns
-        -------
-        f(z) as described above applied elementwise to `Z`
-        """
         Z_stable = Z - np.max(Z, axis=-1, keepdims=True)
         
         # Calculate softmax
@@ -131,18 +96,6 @@ class SoftMax(Activation):
         return softmax_output
 
     def backward(self, Z: np.ndarray, dY: np.ndarray) -> np.ndarray:
-        """Backward pass for softmax activation.
-
-        Parameters
-        ----------
-        Z   input to `forward` method
-        dY  derivative of loss w.r.t. the output of this layer
-            same shape as `Z`
-
-        Returns
-        -------
-        derivative of loss w.r.t. input of this layer
-        """
         softmax_output = self.forward(Z)
         
         # Initialize the gradient with the same shape as dY
@@ -167,32 +120,9 @@ class Sigmoid(Activation):
         super().__init__()
 
     def forward(self, Z: np.ndarray) -> np.ndarray:
-        """Forward pass for sigmoid function:
-        f(z) = 1 / (1 + exp(-z))
-
-        Parameters
-        ----------
-        Z  input pre-activations (any shape)
-
-        Returns
-        -------
-        f(z) as described above applied elementwise to `Z`
-        """
         return 1 / (1 + np.exp(-Z))
 
     def backward(self, Z: np.ndarray, dY: np.ndarray) -> np.ndarray:
-        """Backward pass for sigmoid.
-
-        Parameters
-        ----------
-        Z   input to `forward` method
-        dY  derivative of loss w.r.t. the output of this layer
-            same shape as `Z`
-
-        Returns
-        -------
-        derivative of loss w.r.t. input of this layer
-        """
         sigmoid_Z = self.forward(Z)
         dZ = dY * sigmoid_Z * (1 - sigmoid_Z)
         return dZ
@@ -203,30 +133,9 @@ class TanH(Activation):
         super().__init__()
 
     def forward(self, Z: np.ndarray) -> np.ndarray:
-        """Forward pass for f(z) = tanh(z).
-
-        Parameters
-        ----------
-        Z  input pre-activations (any shape)
-
-        Returns
-        -------
-        f(z) as described above applied elementwise to `Z`
-        """
         return np.tanh(Z)
 
     def backward(self, Z: np.ndarray, dY: np.ndarray) -> np.ndarray:
-        """Backward pass for f(z) = tanh(z).
-
-        Parameters
-        ----------
-        Z   input to `forward` method
-        dY  derivative of loss w.r.t. the output of this layer
-
-        Returns
-        -------
-        derivative of loss w.r.t. input of this layer
-        """
         tanh_Z = self.forward(Z)
         dZ = dY * (1 - np.square(tanh_Z))
         return dZ
