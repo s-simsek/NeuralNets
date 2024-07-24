@@ -7,18 +7,11 @@ from NeuralNetworks.activations import initialize_activation
 from NeuralNetworks.weights import initialize_weights
 
 
-class FullyConnected():
+class Layer(ABC):
     
-    def __init__(self, n_out:int, activation:str, weight_init="xavier_uniform") -> None:
-        super().__init__()
-        self.n_in = None
-        self.n_out = n_out
-        self.activation = initialize_activation(activation)
-        self.parameters = {}
-        self.cache = {}
-        self.gradients = {}
-        # initiate the weights
-        self.init_weights = initialize_weights(weight_init, activation=activation)
+    @abstractmethod
+    def forward(self):
+        pass
     
     def forward_with_param(self, 
                            param_name: str, 
@@ -30,6 +23,24 @@ class FullyConnected():
             self.parameters[param_name] = param_val
             return self.forward(X)
         return inner_forward
+    
+    def clear_gradients(self) -> None:
+        self.cache = {a: [] for a, b in self.cache.items()}
+        self.gradients = {a: np.zeros_like(b) for a, b in self.gradients.items()}
+        
+
+class FullyConnected(Layer):
+    
+    def __init__(self, n_out:int, activation:str, weight_init="xavier_uniform") -> None:
+        super().__init__()
+        self.n_in = None
+        self.n_out = n_out
+        self.activation = initialize_activation(activation)
+        self.parameters = {}
+        self.cache = {}
+        self.gradients = {}
+        # initiate the weights
+        self.init_weights = initialize_weights(weight_init, activation=activation)
     
     def _init_parameters(self, X_shape: Tuple[int, int]) -> None:
         """Initialize all layer parameters
