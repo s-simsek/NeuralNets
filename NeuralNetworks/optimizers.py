@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
 import numpy as np
 
@@ -41,6 +41,10 @@ def initialize_optimizer(name,
 class Optimizer(ABC):
     def __init__(self):
         self.lr = None
+        
+    @abstractmethod
+    def update(self, param_name, param, param_grad):
+        pass
 
 
 class SGD(Optimizer):
