@@ -41,8 +41,14 @@ class NeuralNetwork:
             dLdout = layer.backward(dLdout)
         return loss
     
-    def update(self, epoch: int) -> None:
-        pass
+    def update(self) -> None:
+        for i, layer in enumerate(self.layers):
+            for param_name, param in layer.parameters.items():
+                if param_name is not "null":
+                    param_grad = layer.gradients[param_name]
+                    delta = self.optimizer.update(param_name+str(i), param, param_grad)
+                    layer.parameters[param_name] -= delta
+            layer.clear_gradients()
     
     def train(self, dataset, epochs) -> None:
         pass
