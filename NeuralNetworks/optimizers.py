@@ -15,12 +15,21 @@ def initialize_optimizer(name,
             return SGD(lr=lr, 
                     momentum=momentum, 
                     clip_norm=clip_norm)
+            
         case "Adam":
             return Adam(lr=lr, 
                         beta1=beta1, 
                         beta2=beta2, 
                         epsilon=epsilon, 
                         clip_norm=clip_norm)
+            
+        case "Nadam":
+            return Nadam(lr=lr, 
+                        beta1=beta1, 
+                        beta2=beta2, 
+                        epsilon=epsilon, 
+                        clip_norm=clip_norm)
+               
         case "RMSprop":
             return RMSprop(lr=lr, 
                         beta=beta1, 
@@ -33,6 +42,7 @@ def initialize_optimizer(name,
                                    epsilon=epsilon, 
                                    momentum=momentum, 
                                    clip_norm=clip_norm)
+            
         case _:
             raise NotImplementedError
         
@@ -96,6 +106,37 @@ class Adam(Optimizer):
 
         delta = self.lr * m_hat / (np.sqrt(v_hat) + self.epsilon)
         return delta
+    
+class Nadam(Optimizer):
+    def __init__(self, lr, beta1=0.9, beta2=0.999, epsilon=1e-8, clip_norm=None):
+        self.lr = lr
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.epsilon = epsilon
+        self.clip_norm = clip_norm
+        self.m = {}
+        self.v = {}
+        self.t = 0
+
+    def update(self, param_name, param, param_grad):
+        if param_name not in self.m:
+            self.m[param_name] = np.zeros_like(param)
+            self.v[param_name] = np.zeros_like(param)
+
+        if self.clip_norm is not None:
+            if np.linalg.norm(param_grad) > self.clip_norm:
+                param_grad = param_grad * self.clip_norm / np.linalg.norm(param_grad)
+
+        self.t += 1
+        self.m[param_name] = self.beta1 * self.m[param_name] + (1 - self.beta1) * param_grad
+        self.v[param_name] = self.beta2 * self.v[param_name] + (1 - self.beta2) * (param_grad ** 2)
+
+        
+        m_hat = self.m[param_name] / (1 - self.beta1 ** self.t)
+        v_hat = self.v[param_name] / (1 - self.beta2 ** self.t)
+
+        delta = ((self.lr * self.beta1 * m_hat) / (np.sqrt(v_hat) + self.epsilon)) + ((self.lr * (1 - self.beta1) * param_grad) / (1 + self.beta1 ** self.t))
+        return delta
 
 
 class RMSprop(Optimizer):
@@ -115,7 +156,7 @@ class RMSprop(Optimizer):
                 param_grad = param_grad * self.clip_norm / np.linalg.norm(param_grad)
 
         self.cache[param_name] = self.beta * self.cache[param_name] + (1 - self.beta) * (param_grad ** 2)
-        delta = self.lr * param_grad / (np.sqrt(self.cache[param_name]) + self.epsilon)
+        delta = self.lr * param_grad / np.sqrt(self.cache[param_name] + self.epsilon)
         return delta
     
 class RMSpropNesterov(Optimizer):
@@ -141,8 +182,10 @@ class RMSpropNesterov(Optimizer):
         self.cache[param_name] = self.beta * self.cache[param_name] + (1 - self.beta) * (param_grad ** 2)
         
         # Nesterov momentum
-        prev_velocity = self.velocity[param_name].copy()
-        self.velocity[param_name] = self.momentum * self.velocity[param_name] - self.lr * param_grad / (np.sqrt(self.cache[param_name]) + self.epsilon)
-        delta = self.momentum * self.momentum * prev_velocity - (1 + self.momentum) * self.velocity[param_name]
+        self.velocity[param_name] = self.momentum * self.velocity[param_name] - self.lr * param_grad / np.sqrt(self.cache[param_name]+ self.epsilon) + self.epsilon
+        delta = -self.velocity[param_name]
 
         return delta
+    
+
+
