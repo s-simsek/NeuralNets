@@ -24,6 +24,13 @@ class NeuralNetwork:
         self.y: np.ndarray = None
         
     def _initialize_layers(self, layer_args: Sequence[Dict]) -> None:
+        """Layer initializer
+
+        Parameters
+        ----------
+        layer_args : Sequence[Dict]
+            Sequence of dictionaries where each dictionary is an attribute for the layer
+        """
         self.layers = []
         for l_arg in layer_args[:-1]: 
             l = FullyConnected(**l_arg)
@@ -188,5 +195,29 @@ class NeuralNetwork:
         return f1
         
         
-    def predict(self, X: np.ndarray, Y: np.ndarray) -> Tuple[np.ndarray, float]:
-        pass
+    def predict(self, X: np.ndarray, y_true: np.ndarray) -> Tuple[np.ndarray, float]:
+        """Predicts after training
+
+        Parameters
+        ----------
+        X : np.ndarray
+            Data matrix
+        y_true : np.ndarray
+            True labels
+
+        Returns
+        -------
+        Tuple[np.ndarray, float]
+            predictions, loss
+
+        Raises
+        ------
+        Exception
+            If no prior training has been made
+        """
+        if not self.X:
+            raise Exception('Model has to be trained first')
+        y_pred = self.forward(X)
+        loss = self.backward(y_true, y_pred)
+        return y_pred, loss
+        
