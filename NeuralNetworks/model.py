@@ -1,8 +1,7 @@
 import math
-from typing import Any, Dict, List, Sequence, Tuple
+from typing import Dict, Sequence, Tuple
 
 import numpy as np
-from tqdm import tqdm
 
 from NeuralNetworks.layers import FullyConnected
 from NeuralNetworks.losses import initialize_loss
@@ -195,19 +194,17 @@ class NeuralNetwork:
         return f1
         
         
-    def predict(self, X: np.ndarray, y_true: np.ndarray) -> Tuple[np.ndarray, float]:
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """Predicts after training
 
         Parameters
         ----------
         X : np.ndarray
             Data matrix
-        y_true : np.ndarray
-            True labels
 
         Returns
         -------
-        Tuple[np.ndarray, float]
+        np.ndarray
             predictions, loss
 
         Raises
@@ -215,9 +212,8 @@ class NeuralNetwork:
         Exception
             If no prior training has been made
         """
-        if not self.X:
+        if hasattr(self, self.X): 
+            return self.forward(X)
+        else:
             raise Exception('Model has to be trained first')
-        y_pred = self.forward(X)
-        loss = self.backward(y_true, y_pred)
-        return y_pred, loss
         
