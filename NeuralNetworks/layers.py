@@ -101,20 +101,4 @@ class FullyConnected(Layer):
         self.gradients['b'] = dLdB
         
         return dX
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+    
