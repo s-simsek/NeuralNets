@@ -60,7 +60,7 @@ class NeuralNetwork:
         Returns
         -------
         float
-            _description_
+            the total loss
         """
         assert y_true.shape == y_pred.shape
         loss = self.loss.forward(y_true, y_pred)
@@ -114,7 +114,7 @@ class NeuralNetwork:
         for i in range(epochs):
             training_loss = []
             training_error = []
-            for iteration in tqdm(range(samples_per_epoch)):
+            for iteration in range(samples_per_epoch):
                 X, y = self.sample(iteration, batch_size)
                 y_pred = self.forward(X)
                 loss = self.backward(y, y_pred)
@@ -122,7 +122,7 @@ class NeuralNetwork:
                 training_loss.append(loss)
                 training_error.append(f1)
                 self.update()
-            print(f'Epoch: {i}, Traning Loss: {np.round(np.mean(training_loss), 2)}, Training Error: {np.round(np.mean(training_error), 2)}')       
+            print(f'Epoch: {i}, Traning Loss: {np.round(np.mean(training_loss), 2)}, F-1 Score: {np.round(np.mean(training_error), 2)}')       
        
     def sample(self, iteration: int, batch_size: int) -> Tuple[np.ndarray, np.ndarray]:
         """Samples the data for batch processing
@@ -167,7 +167,8 @@ class NeuralNetwork:
             f-1 score
         """
         # Convert predictions to boolean (0 or 1)
-        y_pred = (y_pred > 0.5).astype(int)
+        y_pred = np.argmax(y_pred, axis=1)
+        y_true = np.argmax(y_true, axis=1)
         
         # Calculate True Positives (TP), False Positives (FP), and False Negatives (FN)
         TP = np.sum((y_pred == 1) & (y_true == 1))
