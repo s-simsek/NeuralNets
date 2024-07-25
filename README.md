@@ -34,5 +34,7 @@
 ## Resources 
 
 [Homework 6](https://people.eecs.berkeley.edu/~jrs/189s21/) from UC Berkeley's CS189 Intro to ML class
+
 [Dive into Deep Learning](https://d2l.ai/)
+
 [Deep Learning Book](https://www.deeplearningbook.org/)
