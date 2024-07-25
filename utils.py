@@ -119,7 +119,6 @@ def train_and_plot(optimizer_names, optimizer_params, X_train, y_train, num_epoc
             grads = nn.backward(X_train, y_train)
             nn.update_params(grads, optimizer)
         
-     
     num_cols = 2
     num_rows = (len(optimizer_names) + num_cols - 1) // num_cols
 
@@ -136,5 +135,31 @@ def train_and_plot(optimizer_names, optimizer_params, X_train, y_train, num_epoc
         fig.delaxes(axs[j])
 
     plt.tight_layout()
+    plt.show()
+    
+def plot_decision_boundary(model, X, y):
+    y= np.argmax(y, axis=1)
+    # Set up meshgrid
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.01),
+                         np.arange(y_min, y_max, 0.01))
+    
+    # Predict on meshgrid
+    Z = model.predict(np.c_[xx.ravel(), yy.ravel()])
+    if len(Z.shape) == 2:
+        Z = np.argmax(Z, axis=1)
+    Z = Z.reshape(xx.shape)
+    
+    # Create plot
+    plt.figure(figsize=(7,4))
+    plt.contourf(xx, yy, Z, alpha=0.8, cmap=plt.cm.Spectral)
+    sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=y, palette='deep', s=50, edgecolor='k')
+    plt.xlim(xx.min(), xx.max())
+    plt.ylim(yy.min(), yy.max())
+    plt.xlabel('Feature 1', fontsize=14)
+    plt.ylabel('Feature 2', fontsize=14)
+    plt.title('Decision Boundary', fontsize=16)
+    plt.legend(loc='best')
     plt.show()
         
