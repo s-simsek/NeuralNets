@@ -213,7 +213,7 @@ class NeuralNetwork:
             If no prior training has been made
         """
         if hasattr(self, "X"): 
-            return self.forward(X)
+            return np.argmax(self.forward(X), axis=1)
         else:
             raise Exception('Model has to be trained first')
         
