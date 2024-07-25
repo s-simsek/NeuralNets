@@ -212,7 +212,7 @@ class NeuralNetwork:
         Exception
             If no prior training has been made
         """
-        if hasattr(self, self.X): 
+        if hasattr(self, "X"): 
             return self.forward(X)
         else:
             raise Exception('Model has to be trained first')
